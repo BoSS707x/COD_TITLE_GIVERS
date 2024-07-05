@@ -232,6 +232,14 @@
         const database = firebase.database();
         const auth = firebase.auth();
 
+        // Check authentication state
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('app-container').style.display = 'block';
+            }
+        });
+
         function login() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
