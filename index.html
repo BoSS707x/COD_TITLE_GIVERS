@@ -193,87 +193,23 @@
         var firebaseConfig = {
             apiKey: "AIzaSyBjxB9IJ85mGG3fkDJExfoUi8VTSnghk1U",
             authDomain: "title-givers.firebaseapp.com",
-            //databaseURL: "YOUR_DATABASE_URL",
+            databaseURL: "https://title-givers-default-rtdb.firebaseio.com",
             projectId: "title-givers",
             storageBucket: "title-givers.appspot.com",
             messagingSenderId: "183878674615",
-            appId: "1:183878674615:web:d3c9c14deb2d7e4cd64532"
+            appId: "1:183878674615:web:d3c9c14deb2d7e4cd64532",
+            measurementId: "G-DK3RGZM76M"
         };
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Function to update queues from Firebase
-        function updateQueuesFromFirebase(snapshot) {
-            const data = snapshot.val();
-            if (data) {
-                queues.spymaster = data.spymaster || [];
-                queues.chiefWarder = data.chiefWarder || [];
-                queues.archmage = data.archmage || [];
-                queues.highScholar = data.highScholar || [];
-                updateQueues();
-            }
-        }
-
-        // Listen for updates to the database
-        database.ref('queues').on('value', updateQueuesFromFirebase);
-
-        // Save queues to Firebase
-        function saveQueuesToFirebase() {
-            database.ref('queues').set(queues);
-        }
-
-        // Your existing JavaScript logic for queue management and timers
         let queues = {
             spymaster: [],
             chiefWarder: [],
             archmage: [],
             highScholar: []
         };
-
-        function saveQueues() {
-            saveQueuesToFirebase();
-        }
-
-        function enqueue(queue) {
-            let nameInput = document.getElementById(`${queue}NameInput`);
-            let name = nameInput.value.trim();
-            if (name !== '') {
-                queues[queue].push(name);
-                nameInput.value = ''; // Clear name field
-                updateQueues();
-                saveQueues();
-            }
-        }
-
-        function dequeue(queue) {
-            if (queues[queue].length > 0) {
-                queues[queue].shift();
-                updateQueues();
-                saveQueues();
-                resetTimer(queue);
-            }
-        }
-
-        function removeLast(queue) {
-            if (queues[queue].length > 0) {
-                queues[queue].pop();
-                updateQueues();
-                saveQueues();
-            }
-        }
-
-        function updateQueues() {
-            document.getElementById('spymasterQueue').innerHTML = queues.spymaster.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
-            document.getElementById('chiefWarderQueue').innerHTML = queues.chiefWarder.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
-            document.getElementById('archmageQueue').innerHTML = queues.archmage.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
-            document.getElementById('highScholarQueue').innerHTML = queues.highScholar.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
-
-            updateCurrentName('spymaster');
-            updateCurrentName('chiefWarder');
-            updateCurrentName('archmage');
-            updateCurrentName('highScholar');
-        }
 
         let timers = {
             spymaster: null,
@@ -288,12 +224,83 @@
             archmage: null,
             highScholar: null
         };
+
         let timerRemainingTimes = {
             spymaster: 300000,
             chiefWarder: 300000,
             archmage: 300000,
             highScholar: 300000
         };
+
+        function updateQueuesFromFirebase(snapshot) {
+            const data = snapshot.val();
+            if (data) {
+                queues.spymaster = data.spymaster || [];
+                queues.chiefWarder = data.chiefWarder || [];
+                queues.archmage = data.archmage || [];
+                queues.highScholar = data.highScholar || [];
+                timerRemainingTimes.spymaster = data.spymasterTimerRemaining || 300000;
+                timerRemainingTimes.chiefWarder = data.chiefWarderTimerRemaining || 300000;
+                timerRemainingTimes.archmage = data.archmageTimerRemaining || 300000;
+                timerRemainingTimes.highScholar = data.highScholarTimerRemaining || 300000;
+                updateQueues();
+            }
+        }
+
+        function saveQueuesToFirebase() {
+            database.ref('queues').set({
+                spymaster: queues.spymaster,
+                chiefWarder: queues.chiefWarder,
+                archmage: queues.archmage,
+                highScholar: queues.highScholar,
+                spymasterTimerRemaining: timerRemainingTimes.spymaster,
+                chiefWarderTimerRemaining: timerRemainingTimes.chiefWarder,
+                archmageTimerRemaining: timerRemainingTimes.archmage,
+                highScholarTimerRemaining: timerRemainingTimes.highScholar
+            });
+        }
+
+        database.ref('queues').on('value', updateQueuesFromFirebase);
+
+        function enqueue(queue) {
+            let nameInput = document.getElementById(`${queue}NameInput`);
+            let name = nameInput.value.trim();
+            if (name !== '') {
+                queues[queue].push(name);
+                nameInput.value = '';
+                updateQueues();
+                saveQueuesToFirebase();
+            }
+        }
+
+        function dequeue(queue) {
+            if (queues[queue].length > 0) {
+                queues[queue].shift();
+                updateQueues();
+                saveQueuesToFirebase();
+                resetTimer(queue);
+            }
+        }
+
+        function removeLast(queue) {
+            if (queues[queue].length > 0) {
+                queues[queue].pop();
+                updateQueues();
+                saveQueuesToFirebase();
+            }
+        }
+
+        function updateQueues() {
+            document.getElementById('spymasterQueue').innerHTML = queues.spymaster.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
+            document.getElementById('chiefWarderQueue').innerHTML = queues.chiefWarder.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
+            document.getElementById('archmageQueue').innerHTML = queues.archmage.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
+            document.getElementById('highScholarQueue').innerHTML = queues.highScholar.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
+
+            updateCurrentName('spymaster');
+            updateCurrentName('chiefWarder');
+            updateCurrentName('archmage');
+            updateCurrentName('highScholar');
+        }
 
         function startTimer(queue) {
             if (!timers[queue]) {
@@ -313,6 +320,7 @@
                     }
 
                     timerRemainingTimes[queue] = remainingTime;
+                    saveQueuesToFirebase();
 
                     let currentName = queues[queue].length > 0 ? queues[queue][0] : '';
                     document.getElementById(`${queue}Timer`).innerText = `Time Left: ${formatTime(remainingTime)}\n For: ${currentName}`;
@@ -326,6 +334,7 @@
             if (timers[queue]) {
                 cancelAnimationFrame(timers[queue]);
                 timers[queue] = null;
+                saveQueuesToFirebase();
             }
         }
 
@@ -335,6 +344,7 @@
             document.getElementById(`${queue}Timer`).innerText = `Time Left: 5:00 `;
             document.getElementById(`${queue}Timer`).classList.remove('timer-red');
             updateCurrentName(queue);
+            saveQueuesToFirebase();
         }
 
         function updateCurrentName(queue) {
@@ -358,6 +368,7 @@
 
         // Initial update of queues on page load
         updateQueues();
+
     </script>
 </body>
 </html>
