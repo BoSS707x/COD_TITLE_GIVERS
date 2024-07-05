@@ -193,7 +193,7 @@
         var firebaseConfig = {
             apiKey: "AIzaSyBjxB9IJ85mGG3fkDJExfoUi8VTSnghk1U",
             authDomain: "title-givers.firebaseapp.com",
-            databaseURL: "https://title-givers-default-rtdb.firebaseio.com",
+            databaseURL: "https://title-givers-default-rtdb.firebaseio.com", // Corrected this line
             projectId: "title-givers",
             storageBucket: "title-givers.appspot.com",
             messagingSenderId: "183878674615",
@@ -306,6 +306,7 @@
             if (!timers[queue]) {
                 let startTime = Date.now();
                 timerEndTimes[queue] = startTime + timerRemainingTimes[queue];
+                saveTimerStateToFirebase(queue, 'start');
 
                 function updateTimer() {
                     let currentTime = Date.now();
@@ -315,6 +316,7 @@
                         remainingTime = 0;
                         document.getElementById(`${queue}Timer`).classList.add('timer-red');
                         playSound();
+                        saveTimerStateToFirebase(queue, 'end');
                     } else {
                         timers[queue] = requestAnimationFrame(updateTimer);
                     }
@@ -334,6 +336,7 @@
             if (timers[queue]) {
                 cancelAnimationFrame(timers[queue]);
                 timers[queue] = null;
+                saveTimerStateToFirebase(queue, 'stop');
                 saveQueuesToFirebase();
             }
         }
@@ -344,8 +347,55 @@
             document.getElementById(`${queue}Timer`).innerText = `Time Left: 5:00 `;
             document.getElementById(`${queue}Timer`).classList.remove('timer-red');
             updateCurrentName(queue);
+            saveTimerStateToFirebase(queue, 'reset');
             saveQueuesToFirebase();
         }
+
+        function saveTimerStateToFirebase(queue, action) {
+            database.ref(`timers/${queue}`).set({
+                endTime: timerEndTimes[queue],
+                remainingTime: timerRemainingTimes[queue],
+                action: action
+            });
+        }
+
+        function updateTimerStateFromFirebase(queue, data) {
+            if (data) {
+                timerEndTimes[queue] = data.endTime;
+                timerRemainingTimes[queue] = data.remainingTime;
+
+                switch (data.action) {
+                    case 'start':
+                        startTimer(queue);
+                        break;
+                    case 'stop':
+                        stopTimer(queue);
+                        break;
+                    case 'reset':
+                        resetTimer(queue);
+                        break;
+                    case 'end':
+                        document.getElementById(`${queue}Timer`).classList.add('timer-red');
+                        break;
+                }
+            }
+        }
+
+        database.ref('timers/spymaster').on('value', (snapshot) => {
+            updateTimerStateFromFirebase('spymaster', snapshot.val());
+        });
+
+        database.ref('timers/chiefWarder').on('value', (snapshot) => {
+            updateTimerStateFromFirebase('chiefWarder', snapshot.val());
+        });
+
+        database.ref('timers/archmage').on('value', (snapshot) => {
+            updateTimerStateFromFirebase('archmage', snapshot.val());
+        });
+
+        database.ref('timers/highScholar').on('value', (snapshot) => {
+            updateTimerStateFromFirebase('highScholar', snapshot.val());
+        });
 
         function updateCurrentName(queue) {
             let currentName = queues[queue].length > 0 ? queues[queue][0] : '';
