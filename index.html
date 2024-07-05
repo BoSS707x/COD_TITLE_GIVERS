@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue Management System</title>
+    <style>
+        /* CSS styles for layout */
+        .container {
+            display: contents;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 1500px;
+            margin: 1px auto;
+            padding: 5px;
+        }
+        .form-container {
+            display: block;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 0px;
+        }
+        .form-container > * {
+            flex: 2;
+            margin-right: 5px;
+            font-size: 16px;
+            padding: 10px;
+            margin-bottom: 0px;
+        }
+        .input-field {
+            width: 90%;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .control-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .control-buttons button {
+            padding: 7px 7px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            flex-grow: 1;
+        }
+        .queue-container {
+            display: flex;
+            justify-content: left;
+            width: 800px;
+            max-width: 1000px;
+            margin-top: 10px;
+        }
+        .queue-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 2000px;
+        }
+        .queue {
+            display: block;
+            border: 2px solid #ccc;
+            padding: 0px;
+            width: 220px;
+            height: 200px;
+            overflow-y: auto;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .timer-container {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            align-items: center;
+            width: 200px;
+            padding: 5px 0;
+        }
+        .timer {
+            text-align: left;
+            width: 100%;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .current-name {
+            text-align: right;
+            font-size: 16px;
+            font-weight: bold;
+            white-space: nowrap; /* Ensure the name doesn't wrap to the next line */
+        }
+        .timer-buttons {
+            display: flex;
+            justify-content: center;
+            width: 100px;
+        }
+        button {
+            padding: 5px 10px;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .timer-red {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="queue-container">
+            <div class="queue-wrapper">
+                <h2 id="spymasterHeader">Spymaster</h2>
+                <input type="text" id="spymasterNameInput" class="input-field" placeholder="Enter Name">
+                <div class="control-buttons">
+                    <button onclick="enqueue('spymaster')">IN</button>
+                    <button onclick="dequeue('spymaster')">OUT FIRST</button>
+                    <button onclick="removeLast('spymaster')">OUT LAST</button>
+                </div>
+                <div class="queue" id="spymasterQueue"></div>
+                <div class="timer-container">
+                    <div class="timer" id="spymasterTimer">Time Left: 5:00<br>For:</div>
+                </div>
+                <div class="timer-buttons">
+                    <button onclick="startTimer('spymaster')">Start</button>
+                    <button onclick="stopTimer('spymaster')">Stop</button>
+                    <button onclick="resetTimer('spymaster')">Reset</button>
+                </div>
+            </div>
+            <div class="queue-wrapper">
+                <h2 id="chiefWarderHeader">Chief Warder</h2>
+                <input type="text" id="chiefWarderNameInput" class="input-field" placeholder="Enter Name">
+                <div class="control-buttons">
+                    <button onclick="enqueue('chiefWarder')">IN</button>
+                    <button onclick="dequeue('chiefWarder')">OUT FIRST</button>
+                    <button onclick="removeLast('chiefWarder')">OUT LAST</button>
+                </div>
+                <div class="queue" id="chiefWarderQueue"></div>
+                <div class="timer-container">
+                    <div class="timer" id="chiefWarderTimer">Time Left: 5:00<br>For:</div>
+                </div>
+                <div class="timer-buttons">
+                    <button onclick="startTimer('chiefWarder')">Start</button>
+                    <button onclick="stopTimer('chiefWarder')">Stop</button>
+                    <button onclick="resetTimer('chiefWarder')">Reset</button>
+                </div>
+            </div>
+            <div class="queue-wrapper">
+                <h2 id="archmageHeader">Archmage</h2>
+                <input type="text" id="archmageNameInput" class="input-field" placeholder="Enter Name">
+                <div class="control-buttons">
+                    <button onclick="enqueue('archmage')">IN</button>
+                    <button onclick="dequeue('archmage')">OUT FIRST</button>
+                    <button onclick="removeLast('archmage')">OUT LAST</button>
+                </div>
+                <div class="queue" id="archmageQueue"></div>
+                <div class="timer-container">
+                    <div class="timer" id="archmageTimer">Time Left: 5:00<br>For:</div>
+                </div>
+                <div class="timer-buttons">
+                    <button onclick="startTimer('archmage')">Start</button>
+                    <button onclick="stopTimer('archmage')">Stop</button>
+                    <button onclick="resetTimer('archmage')">Reset</button>
+                </div>
+            </div>
+            <div class="queue-wrapper">
+                <h2 id="highScholarHeader">High Scholar</h2>
+                <input type="text" id="highScholarNameInput" class="input-field" placeholder="Enter Name">
+                <div class="control-buttons">
+                    <button onclick="enqueue('highScholar')">IN</button>
+                    <button onclick="dequeue('highScholar')">OUT FIRST</button>
+                    <button onclick="removeLast('highScholar')">OUT LAST</button>
+                </div>
+                <div class="queue" id="highScholarQueue"></div>
+                <div class="timer-container">
+                    <div class="timer" id="highScholarTimer">Time Left: 5:00<br>For:</div>
+                </div>
+                <div class="timer-buttons">
+                    <button onclick="startTimer('highScholar')">Start</button>
+                    <button onclick="stopTimer('highScholar')">Stop</button>
+                    <button onclick="resetTimer('highScholar')">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script>
+        // Your Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyBjxB9IJ85mGG3fkDJExfoUi8VTSnghk1U",
+            authDomain: "title-givers.firebaseapp.com",
+            //databaseURL: "YOUR_DATABASE_URL",
+            projectId: "title-givers",
+            storageBucket: "title-givers.appspot.com",
+            messagingSenderId: "183878674615",
+            appId: "1:183878674615:web:d3c9c14deb2d7e4cd64532"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Function to update queues from Firebase
+        function updateQueuesFromFirebase(snapshot) {
+            const data = snapshot.val();
+            if (data) {
+                queues.spymaster = data.spymaster || [];
+                queues.chiefWarder = data.chiefWarder || [];
+                queues.archmage = data.archmage || [];
+                queues.highScholar = data.highScholar || [];
+                updateQueues();
+            }
+        }
+
+        // Listen for updates to the database
+        database.ref('queues').on('value', updateQueuesFromFirebase);
+
+        // Save queues to Firebase
+        function saveQueuesToFirebase() {
+            database.ref('queues').set(queues);
+        }
+
+        // Your existing JavaScript logic for queue management and timers
+        let queues = {
+            spymaster: [],
+            chiefWarder: [],
+            archmage: [],
+            highScholar: []
+        };
+
+        function saveQueues() {
+            saveQueuesToFirebase();
+        }
+
+        function enqueue(queue) {
+            let nameInput = document.getElementById(`${queue}NameInput`);
+            let name = nameInput.value.trim();
+            if (name !== '') {
+                queues[queue].push(name);
+                nameInput.value = ''; // Clear name field
+                updateQueues();
+                saveQueues();
+            }
+        }
+
+        function dequeue(queue) {
+            if (queues[queue].length > 0) {
+                queues[queue].shift();
+                updateQueues();
+                saveQueues();
+                resetTimer(queue);
+            }
+        }
+
+        function removeLast(queue) {
+            if (queues[queue].length > 0) {
+                queues[queue].pop();
+                updateQueues();
+                saveQueues();
+            }
+        }
+
+        function updateQueues() {
+            document.getElementById('spymasterQueue').innerHTML = queues.spymaster.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
+            document.getElementById('chiefWarderQueue').innerHTML = queues.chiefWarder.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
+            document.getElementById('archmageQueue').innerHTML = queues.archmage.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
+            document.getElementById('highScholarQueue').innerHTML = queues.highScholar.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
+
+            updateCurrentName('spymaster');
+            updateCurrentName('chiefWarder');
+            updateCurrentName('archmage');
+            updateCurrentName('highScholar');
+        }
+
+        let timers = {
+            spymaster: null,
+            chiefWarder: null,
+            archmage: null,
+            highScholar: null
+        };
+
+        let timerEndTimes = {
+            spymaster: null,
+            chiefWarder: null,
+            archmage: null,
+            highScholar: null
+        };
+        let timerRemainingTimes = {
+            spymaster: 300000,
+            chiefWarder: 300000,
+            archmage: 300000,
+            highScholar: 300000
+        };
+
+        function startTimer(queue) {
+            if (!timers[queue]) {
+                let startTime = Date.now();
+                timerEndTimes[queue] = startTime + timerRemainingTimes[queue];
+
+                function updateTimer() {
+                    let currentTime = Date.now();
+                    let remainingTime = timerEndTimes[queue] - currentTime;
+
+                    if (remainingTime <= 0) {
+                        remainingTime = 0;
+                        document.getElementById(`${queue}Timer`).classList.add('timer-red');
+                        playSound();
+                    } else {
+                        timers[queue] = requestAnimationFrame(updateTimer);
+                    }
+
+                    timerRemainingTimes[queue] = remainingTime;
+
+                    let currentName = queues[queue].length > 0 ? queues[queue][0] : '';
+                    document.getElementById(`${queue}Timer`).innerText = `Time Left: ${formatTime(remainingTime)}\n For: ${currentName}`;
+                }
+
+                timers[queue] = requestAnimationFrame(updateTimer);
+            }
+        }
+
+        function stopTimer(queue) {
+            if (timers[queue]) {
+                cancelAnimationFrame(timers[queue]);
+                timers[queue] = null;
+            }
+        }
+
+        function resetTimer(queue) {
+            stopTimer(queue);
+            timerRemainingTimes[queue] = 300000;
+            document.getElementById(`${queue}Timer`).innerText = `Time Left: 5:00 `;
+            document.getElementById(`${queue}Timer`).classList.remove('timer-red');
+            updateCurrentName(queue);
+        }
+
+        function updateCurrentName(queue) {
+            let currentName = queues[queue].length > 0 ? queues[queue][0] : '';
+            document.getElementById(`${queue}Timer`).innerHTML = `Time Left: 5:00<br>For: ${currentName}`;
+        }
+
+        function formatTime(ms) {
+            let seconds = Math.floor(ms / 1000);
+            let minutes = Math.floor(seconds / 60);
+            seconds = seconds % 60;
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function playSound() {
+            var audio = new Audio('sounds/beep.mp3');
+            audio.play().catch(function(error) {
+                console.error('Audio playback failed:', error);
+            });
+        }
+
+        // Initial update of queues on page load
+        updateQueues();
+    </script>
+</body>
+</html>
