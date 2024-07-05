@@ -94,7 +94,7 @@
         .timer-buttons {
             display: flex;
             justify-content: center;
-            width: 100px;
+            width: 150px;
         }
         button {
             padding: 5px 10px;
@@ -114,72 +114,72 @@
                 <h2 id="spymasterHeader">Spymaster</h2>
                 <input type="text" id="spymasterNameInput" class="input-field" placeholder="Enter Name">
                 <div class="control-buttons">
-                    <button onclick="enqueue('spymaster')">IN</button>
-                    <button onclick="dequeue('spymaster')">OUT FIRST</button>
-                    <button onclick="removeLast('spymaster')">OUT LAST</button>
+                    <button onclick="enqueueSpymaster()">IN</button>
+                    <button onclick="dequeueSpymaster()">OUT FIRST</button>
+                    <button onclick="removeLastSpymaster()">OUT LAST</button>
                 </div>
                 <div class="queue" id="spymasterQueue"></div>
                 <div class="timer-container">
                     <div class="timer" id="spymasterTimer">Time Left: 5:00<br>For:</div>
                 </div>
                 <div class="timer-buttons">
-                    <button onclick="startTimer('spymaster')">Start</button>
-                    <button onclick="pauseTimer('spymaster')">Pause</button>
-                    <button onclick="resetTimer('spymaster')">Reset</button>
+                    <button onclick="startTimerSpymaster()">Start</button>
+                    <button onclick="pauseTimerSpymaster()">Pause</button>
+                    <button onclick="resetTimerSpymaster()">Reset</button>
                 </div>
             </div>
             <div class="queue-wrapper">
                 <h2 id="chiefWarderHeader">Chief Warder</h2>
                 <input type="text" id="chiefWarderNameInput" class="input-field" placeholder="Enter Name">
                 <div class="control-buttons">
-                    <button onclick="enqueue('chiefWarder')">IN</button>
-                    <button onclick="dequeue('chiefWarder')">OUT FIRST</button>
-                    <button onclick="removeLast('chiefWarder')">OUT LAST</button>
+                    <button onclick="enqueueChiefWarder()">IN</button>
+                    <button onclick="dequeueChiefWarder()">OUT FIRST</button>
+                    <button onclick="removeLastChiefWarder()">OUT LAST</button>
                 </div>
                 <div class="queue" id="chiefWarderQueue"></div>
                 <div class="timer-container">
                     <div class="timer" id="chiefWarderTimer">Time Left: 5:00<br>For:</div>
                 </div>
                 <div class="timer-buttons">
-                    <button onclick="startTimer('chiefWarder')">Start</button>
-                    <button onclick="pauseTimer('chiefWarder')">Pause</button>
-                    <button onclick="resetTimer('chiefWarder')">Reset</button>
+                    <button onclick="startTimerChiefWarder()">Start</button>
+                    <button onclick="pauseTimerChiefWarder()">Pause</button>
+                    <button onclick="resetTimerChiefWarder()">Reset</button>
                 </div>
             </div>
             <div class="queue-wrapper">
                 <h2 id="archmageHeader">Archmage</h2>
                 <input type="text" id="archmageNameInput" class="input-field" placeholder="Enter Name">
                 <div class="control-buttons">
-                    <button onclick="enqueue('archmage')">IN</button>
-                    <button onclick="dequeue('archmage')">OUT FIRST</button>
-                    <button onclick="removeLast('archmage')">OUT LAST</button>
+                    <button onclick="enqueueArchmage()">IN</button>
+                    <button onclick="dequeueArchmage()">OUT FIRST</button>
+                    <button onclick="removeLastArchmage()">OUT LAST</button>
                 </div>
                 <div class="queue" id="archmageQueue"></div>
                 <div class="timer-container">
                     <div class="timer" id="archmageTimer">Time Left: 5:00<br>For:</div>
                 </div>
                 <div class="timer-buttons">
-                    <button onclick="startTimer('archmage')">Start</button>
-                    <button onclick="pauseTimer('archmage')">Pause</button>
-                    <button onclick="resetTimer('archmage')">Reset</button>
+                    <button onclick="startTimerArchmage()">Start</button>
+                    <button onclick="pauseTimerArchmage()">Pause</button>
+                    <button onclick="resetTimerArchmage()">Reset</button>
                 </div>
             </div>
             <div class="queue-wrapper">
                 <h2 id="highScholarHeader">High Scholar</h2>
                 <input type="text" id="highScholarNameInput" class="input-field" placeholder="Enter Name">
                 <div class="control-buttons">
-                    <button onclick="enqueue('highScholar')">IN</button>
-                    <button onclick="dequeue('highScholar')">OUT FIRST</button>
-                    <button onclick="removeLast('highScholar')">OUT LAST</button>
+                    <button onclick="enqueueHighScholar()">IN</button>
+                    <button onclick="dequeueHighScholar()">OUT FIRST</button>
+                    <button onclick="removeLastHighScholar()">OUT LAST</button>
                 </div>
                 <div class="queue" id="highScholarQueue"></div>
                 <div class="timer-container">
                     <div class="timer" id="highScholarTimer">Time Left: 5:00<br>For:</div>
                 </div>
                 <div class="timer-buttons">
-                    <button onclick="startTimer('highScholar')">Start</button>
-                    <button onclick="pauseTimer('highScholar')">Pause</button>
-                    <button onclick="resetTimer('highScholar')">Reset</button>
+                    <button onclick="startTimerHighScholar()">Start</button>
+                    <button onclick="pauseTimerHighScholar()">Pause</button>
+                    <button onclick="resetTimerHighScholar()">Reset</button>
                 </div>
             </div>
         </div>
@@ -226,57 +226,173 @@
         };
 
         let timerRemainingTimes = {
-            spymaster: 300000,
-            chiefWarder: 300000,
-            archmage: 300000,
-            highScholar: 300000
+            spymaster: 300,
+            chiefWarder: 300,
+            archmage: 300,
+            highScholar: 300
         };
 
-        let timerPaused = {
-            spymaster: false,
-            chiefWarder: false,
-            archmage: false,
-            highScholar: false
-        };
-
-        function updateQueuesFromFirebase(snapshot) {
+        function updateQueueSpymaster(snapshot) {
             const data = snapshot.val();
             if (data) {
-                queues.spymaster = data.spymaster || [];
-                queues.chiefWarder = data.chiefWarder || [];
-                queues.archmage = data.archmage || [];
-                queues.highScholar = data.highScholar || [];
-                timerRemainingTimes.spymaster = data.spymasterTimerRemaining || 300000;
-                timerRemainingTimes.chiefWarder = data.chiefWarderTimerRemaining || 300000;
-                timerRemainingTimes.archmage = data.archmageTimerRemaining || 300000;
-                timerRemainingTimes.highScholar = data.highScholarTimerRemaining || 300000;
-                timerPaused.spymaster = data.spymasterPaused || false;
-                timerPaused.chiefWarder = data.chiefWarderPaused || false;
-                timerPaused.archmage = data.archmagePaused || false;
-                timerPaused.highScholar = data.highScholarPaused || false;
-                updateQueues();
-                updateTimers();
+                queues.spymaster = data.queue || [];
+                timerRemainingTimes.spymaster = data.timerRemaining || 300;
+                updateQueue('spymaster');
+                updateTimerDisplay('spymaster');
             }
         }
 
-        function saveQueuesToFirebase() {
-            database.ref('queues').set({
-                spymaster: queues.spymaster,
-                chiefWarder: queues.chiefWarder,
-                archmage: queues.archmage,
-                highScholar: queues.highScholar,
-                spymasterTimerRemaining: timerRemainingTimes.spymaster,
-                chiefWarderTimerRemaining: timerRemainingTimes.chiefWarder,
-                archmageTimerRemaining: timerRemainingTimes.archmage,
-                highScholarTimerRemaining: timerRemainingTimes.highScholar,
-                spymasterPaused: timerPaused.spymaster,
-                chiefWarderPaused: timerPaused.chiefWarder,
-                archmagePaused: timerPaused.archmage,
-                highScholarPaused: timerPaused.highScholar
+        function updateQueueChiefWarder(snapshot) {
+            const data = snapshot.val();
+            if (data) {
+                queues.chiefWarder = data.queue || [];
+                timerRemainingTimes.chiefWarder = data.timerRemaining || 300;
+                updateQueue('chiefWarder');
+                updateTimerDisplay('chiefWarder');
+            }
+        }
+
+        function updateQueueArchmage(snapshot) {
+            const data = snapshot.val();
+            if (data) {
+                queues.archmage = data.queue || [];
+                timerRemainingTimes.archmage = data.timerRemaining || 300;
+                updateQueue('archmage');
+                updateTimerDisplay('archmage');
+            }
+        }
+
+        function updateQueueHighScholar(snapshot) {
+            const data = snapshot.val();
+            if (data) {
+                queues.highScholar = data.queue || [];
+                timerRemainingTimes.highScholar = data.timerRemaining || 300;
+                updateQueue('highScholar');
+                updateTimerDisplay('highScholar');
+            }
+        }
+
+        function saveQueueToFirebase(queue) {
+            database.ref(`queues/${queue}`).set({
+                queue: queues[queue],
+                timerRemaining: timerRemainingTimes[queue]
             });
         }
 
-        database.ref('queues').on('value', updateQueuesFromFirebase);
+        function initializeQueueListeners() {
+            database.ref(`queues/spymaster`).on('value', updateQueueSpymaster);
+            database.ref(`queues/chiefWarder`).on('value', updateQueueChiefWarder);
+            database.ref(`queues/archmage`).on('value', updateQueueArchmage);
+            database.ref(`queues/highScholar`).on('value', updateQueueHighScholar);
+
+            database.ref(`timers/spymaster`).on('value', (snapshot) => updateTimerStateFromFirebase('spymaster', snapshot.val()));
+            database.ref(`timers/chiefWarder`).on('value', (snapshot) => updateTimerStateFromFirebase('chiefWarder', snapshot.val()));
+            database.ref(`timers/archmage`).on('value', (snapshot) => updateTimerStateFromFirebase('archmage', snapshot.val()));
+            database.ref(`timers/highScholar`).on('value', (snapshot) => updateTimerStateFromFirebase('highScholar', snapshot.val()));
+        }
+
+        initializeQueueListeners();
+
+        function enqueueSpymaster() {
+            enqueue('spymaster');
+        }
+
+        function enqueueChiefWarder() {
+            enqueue('chiefWarder');
+        }
+
+        function enqueueArchmage() {
+            enqueue('archmage');
+        }
+
+        function enqueueHighScholar() {
+            enqueue('highScholar');
+        }
+
+        function dequeueSpymaster() {
+            dequeue('spymaster');
+        }
+
+        function dequeueChiefWarder() {
+            dequeue('chiefWarder');
+        }
+
+        function dequeueArchmage() {
+            dequeue('archmage');
+        }
+
+        function dequeueHighScholar() {
+            dequeue('highScholar');
+        }
+
+        function removeLastSpymaster() {
+            removeLast('spymaster');
+        }
+
+        function removeLastChiefWarder() {
+            removeLast('chiefWarder');
+        }
+
+        function removeLastArchmage() {
+            removeLast('archmage');
+        }
+
+        function removeLastHighScholar() {
+            removeLast('highScholar');
+        }
+
+        function updateQueue(queue) {
+            document.getElementById(`${queue}Queue`).innerHTML = queues[queue].map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
+            updateCurrentName(queue);
+        }
+
+        function startTimerSpymaster() {
+            startTimer('spymaster');
+        }
+
+        function startTimerChiefWarder() {
+            startTimer('chiefWarder');
+        }
+
+        function startTimerArchmage() {
+            startTimer('archmage');
+        }
+
+        function startTimerHighScholar() {
+            startTimer('highScholar');
+        }
+
+        function pauseTimerSpymaster() {
+            pauseTimer('spymaster');
+        }
+
+        function pauseTimerChiefWarder() {
+            pauseTimer('chiefWarder');
+        }
+
+        function pauseTimerArchmage() {
+            pauseTimer('archmage');
+        }
+
+        function pauseTimerHighScholar() {
+            pauseTimer('highScholar');
+        }
+
+        function resetTimerSpymaster() {
+            resetTimer('spymaster');
+        }
+
+        function resetTimerChiefWarder() {
+            resetTimer('chiefWarder');
+        }
+
+        function resetTimerArchmage() {
+            resetTimer('archmage');
+        }
+
+        function resetTimerHighScholar() {
+            resetTimer('highScholar');
+        }
 
         function enqueue(queue) {
             let nameInput = document.getElementById(`${queue}NameInput`);
@@ -284,16 +400,16 @@
             if (name !== '') {
                 queues[queue].push(name);
                 nameInput.value = '';
-                updateQueues();
-                saveQueuesToFirebase();
+                updateQueue(queue);
+                saveQueueToFirebase(queue);
             }
         }
 
         function dequeue(queue) {
             if (queues[queue].length > 0) {
                 queues[queue].shift();
-                updateQueues();
-                saveQueuesToFirebase();
+                updateQueue(queue);
+                saveQueueToFirebase(queue);
                 resetTimer(queue);
             }
         }
@@ -301,37 +417,20 @@
         function removeLast(queue) {
             if (queues[queue].length > 0) {
                 queues[queue].pop();
-                updateQueues();
-                saveQueuesToFirebase();
+                updateQueue(queue);
+                saveQueueToFirebase(queue);
             }
-        }
-
-        function updateQueues() {
-            document.getElementById('spymasterQueue').innerHTML = queues.spymaster.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
-            document.getElementById('chiefWarderQueue').innerHTML = queues.chiefWarder.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
-            document.getElementById('archmageQueue').innerHTML = queues.archmage.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
-            document.getElementById('highScholarQueue').innerHTML = queues.highScholar.map((item, index) => `<div>${index + 1}- ${item}</div>`).join('');
-
-            updateCurrentName('spymaster');
-            updateCurrentName('chiefWarder');
-            updateCurrentName('archmage');
-            updateCurrentName('highScholar');
         }
 
         function startTimer(queue) {
             if (!timers[queue]) {
                 let startTime = Date.now();
-                if (!timerPaused[queue]) {
-                    timerEndTimes[queue] = startTime + timerRemainingTimes[queue];
-                } else {
-                    timerEndTimes[queue] = startTime + timerRemainingTimes[queue];
-                    timerPaused[queue] = false;
-                }
+                timerEndTimes[queue] = startTime + timerRemainingTimes[queue] * 1000;
                 saveTimerStateToFirebase(queue, 'start');
 
                 function updateTimer() {
                     let currentTime = Date.now();
-                    let remainingTime = timerEndTimes[queue] - currentTime;
+                    let remainingTime = Math.floor((timerEndTimes[queue] - currentTime) / 1000);
 
                     if (remainingTime <= 0) {
                         remainingTime = 0;
@@ -343,7 +442,7 @@
                     }
 
                     timerRemainingTimes[queue] = remainingTime;
-                    saveQueuesToFirebase();
+                    saveQueueToFirebase(queue);
 
                     let currentName = queues[queue].length > 0 ? queues[queue][0] : '';
                     document.getElementById(`${queue}Timer`).innerText = `Time Left: ${formatTime(remainingTime)}\n For: ${currentName}`;
@@ -357,36 +456,36 @@
             if (timers[queue]) {
                 cancelAnimationFrame(timers[queue]);
                 timers[queue] = null;
-                timerPaused[queue] = true;
                 saveTimerStateToFirebase(queue, 'pause');
-                saveQueuesToFirebase();
+                saveQueueToFirebase(queue);
             }
         }
 
         function resetTimer(queue) {
-            pauseTimer(queue);
-            timerRemainingTimes[queue] = 300000;
+            if (timers[queue]) {
+                cancelAnimationFrame(timers[queue]);
+                timers[queue] = null;
+            }
+            timerRemainingTimes[queue] = 300;
             document.getElementById(`${queue}Timer`).innerText = `Time Left: 5:00 `;
             document.getElementById(`${queue}Timer`).classList.remove('timer-red');
             updateCurrentName(queue);
             saveTimerStateToFirebase(queue, 'reset');
-            saveQueuesToFirebase();
+            saveQueueToFirebase(queue);
         }
 
         function saveTimerStateToFirebase(queue, action) {
             database.ref(`timers/${queue}`).set({
-                endTime: timerEndTimes[queue],
+                endTime: timerEndTimes[queue] || null,
                 remainingTime: timerRemainingTimes[queue],
-                action: action,
-                paused: timerPaused[queue]
+                action: action
             });
         }
 
         function updateTimerStateFromFirebase(queue, data) {
             if (data) {
-                timerEndTimes[queue] = data.endTime;
-                timerRemainingTimes[queue] = data.remainingTime;
-                timerPaused[queue] = data.paused;
+                timerEndTimes[queue] = data.endTime || Date.now() + timerRemainingTimes[queue] * 1000;
+                timerRemainingTimes[queue] = data.remainingTime || 300;
 
                 switch (data.action) {
                     case 'start':
@@ -405,32 +504,15 @@
             }
         }
 
-        database.ref('timers/spymaster').on('value', (snapshot) => {
-            updateTimerStateFromFirebase('spymaster', snapshot.val());
-        });
-
-        database.ref('timers/chiefWarder').on('value', (snapshot) => {
-            updateTimerStateFromFirebase('chiefWarder', snapshot.val());
-        });
-
-        database.ref('timers/archmage').on('value', (snapshot) => {
-            updateTimerStateFromFirebase('archmage', snapshot.val());
-        });
-
-        database.ref('timers/highScholar').on('value', (snapshot) => {
-            updateTimerStateFromFirebase('highScholar', snapshot.val());
-        });
-
         function updateCurrentName(queue) {
             let currentName = queues[queue].length > 0 ? queues[queue][0] : '';
             document.getElementById(`${queue}Timer`).innerHTML = `Time Left: 5:00<br>For: ${currentName}`;
         }
 
-        function formatTime(ms) {
-            let seconds = Math.floor(ms / 1000);
+        function formatTime(seconds) {
             let minutes = Math.floor(seconds / 60);
-            seconds = seconds % 60;
-            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            let secs = seconds % 60;
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
         }
 
         function playSound() {
@@ -440,18 +522,14 @@
             });
         }
 
-        function updateTimers() {
-            for (let queue in timers) {
-                if (!timerPaused[queue] && timerRemainingTimes[queue] < 300000) {
-                    startTimer(queue);
-                } else if (timerPaused[queue]) {
-                    document.getElementById(`${queue}Timer`).innerText = `Time Left: ${formatTime(timerRemainingTimes[queue])} `;
-                }
+        function updateTimerDisplay(queue) {
+            if (timerRemainingTimes[queue] < 300) {
+                startTimer(queue);
             }
         }
 
         // Initial update of queues on page load
-        updateQueues();
+        ['spymaster', 'chiefWarder', 'archmage', 'highScholar'].forEach(updateQueue);
 
     </script>
 </body>
