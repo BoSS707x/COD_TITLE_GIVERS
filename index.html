@@ -124,7 +124,7 @@
                 </div>
                 <div class="timer-buttons">
                     <button onclick="startTimer('spymaster')">Start</button>
-                    <button onclick="stopTimer('spymaster')">Stop</button>
+                    <button onclick="pauseTimer('spymaster')">Pause</button>
                     <button onclick="resetTimer('spymaster')">Reset</button>
                 </div>
             </div>
@@ -142,7 +142,7 @@
                 </div>
                 <div class="timer-buttons">
                     <button onclick="startTimer('chiefWarder')">Start</button>
-                    <button onclick="stopTimer('chiefWarder')">Stop</button>
+                    <button onclick="pauseTimer('chiefWarder')">Pause</button>
                     <button onclick="resetTimer('chiefWarder')">Reset</button>
                 </div>
             </div>
@@ -160,7 +160,7 @@
                 </div>
                 <div class="timer-buttons">
                     <button onclick="startTimer('archmage')">Start</button>
-                    <button onclick="stopTimer('archmage')">Stop</button>
+                    <button onclick="pauseTimer('archmage')">Pause</button>
                     <button onclick="resetTimer('archmage')">Reset</button>
                 </div>
             </div>
@@ -178,7 +178,7 @@
                 </div>
                 <div class="timer-buttons">
                     <button onclick="startTimer('highScholar')">Start</button>
-                    <button onclick="stopTimer('highScholar')">Stop</button>
+                    <button onclick="pauseTimer('highScholar')">Pause</button>
                     <button onclick="resetTimer('highScholar')">Reset</button>
                 </div>
             </div>
@@ -232,6 +232,13 @@
             highScholar: 300000
         };
 
+        let timerPaused = {
+            spymaster: false,
+            chiefWarder: false,
+            archmage: false,
+            highScholar: false
+        };
+
         function updateQueuesFromFirebase(snapshot) {
             const data = snapshot.val();
             if (data) {
@@ -243,7 +250,12 @@
                 timerRemainingTimes.chiefWarder = data.chiefWarderTimerRemaining || 300000;
                 timerRemainingTimes.archmage = data.archmageTimerRemaining || 300000;
                 timerRemainingTimes.highScholar = data.highScholarTimerRemaining || 300000;
+                timerPaused.spymaster = data.spymasterPaused || false;
+                timerPaused.chiefWarder = data.chiefWarderPaused || false;
+                timerPaused.archmage = data.archmagePaused || false;
+                timerPaused.highScholar = data.highScholarPaused || false;
                 updateQueues();
+                updateTimers();
             }
         }
 
@@ -256,7 +268,11 @@
                 spymasterTimerRemaining: timerRemainingTimes.spymaster,
                 chiefWarderTimerRemaining: timerRemainingTimes.chiefWarder,
                 archmageTimerRemaining: timerRemainingTimes.archmage,
-                highScholarTimerRemaining: timerRemainingTimes.highScholar
+                highScholarTimerRemaining: timerRemainingTimes.highScholar,
+                spymasterPaused: timerPaused.spymaster,
+                chiefWarderPaused: timerPaused.chiefWarder,
+                archmagePaused: timerPaused.archmage,
+                highScholarPaused: timerPaused.highScholar
             });
         }
 
@@ -305,7 +321,12 @@
         function startTimer(queue) {
             if (!timers[queue]) {
                 let startTime = Date.now();
-                timerEndTimes[queue] = startTime + timerRemainingTimes[queue];
+                if (!timerPaused[queue]) {
+                    timerEndTimes[queue] = startTime + timerRemainingTimes[queue];
+                } else {
+                    timerEndTimes[queue] = startTime + timerRemainingTimes[queue];
+                    timerPaused[queue] = false;
+                }
                 saveTimerStateToFirebase(queue, 'start');
 
                 function updateTimer() {
@@ -332,17 +353,18 @@
             }
         }
 
-        function stopTimer(queue) {
+        function pauseTimer(queue) {
             if (timers[queue]) {
                 cancelAnimationFrame(timers[queue]);
                 timers[queue] = null;
-                saveTimerStateToFirebase(queue, 'stop');
+                timerPaused[queue] = true;
+                saveTimerStateToFirebase(queue, 'pause');
                 saveQueuesToFirebase();
             }
         }
 
         function resetTimer(queue) {
-            stopTimer(queue);
+            pauseTimer(queue);
             timerRemainingTimes[queue] = 300000;
             document.getElementById(`${queue}Timer`).innerText = `Time Left: 5:00 `;
             document.getElementById(`${queue}Timer`).classList.remove('timer-red');
@@ -355,7 +377,8 @@
             database.ref(`timers/${queue}`).set({
                 endTime: timerEndTimes[queue],
                 remainingTime: timerRemainingTimes[queue],
-                action: action
+                action: action,
+                paused: timerPaused[queue]
             });
         }
 
@@ -363,13 +386,14 @@
             if (data) {
                 timerEndTimes[queue] = data.endTime;
                 timerRemainingTimes[queue] = data.remainingTime;
+                timerPaused[queue] = data.paused;
 
                 switch (data.action) {
                     case 'start':
                         startTimer(queue);
                         break;
-                    case 'stop':
-                        stopTimer(queue);
+                    case 'pause':
+                        pauseTimer(queue);
                         break;
                     case 'reset':
                         resetTimer(queue);
@@ -414,6 +438,16 @@
             audio.play().catch(function(error) {
                 console.error('Audio playback failed:', error);
             });
+        }
+
+        function updateTimers() {
+            for (let queue in timers) {
+                if (!timerPaused[queue] && timerRemainingTimes[queue] < 300000) {
+                    startTimer(queue);
+                } else if (timerPaused[queue]) {
+                    document.getElementById(`${queue}Timer`).innerText = `Time Left: ${formatTime(timerRemainingTimes[queue])} `;
+                }
+            }
         }
 
         // Initial update of queues on page load
